@@ -8,6 +8,32 @@ This is your page!
   import ArticleBody from '$lib/components/ArticleBody.svelte';
   import Image from '$lib/components/Image.svelte';
   import RelatedLinks from '$lib/components/RelatedLinks.svelte';
+  import RestaurantTable from '$lib/components/RestaurantTable.svelte';
+  import BigNumber from '$lib/components/BigNumber.svelte';
+  import Dashboard from '$lib/components/Dashboard.svelte';
+
+  // Receive data from the load function in +page.js
+  let { data } = $props();
+  let selectedBorough = $state("");
+  let selectedCuisine = $state("");
+  let selectedGrade = $state("");
+  let cuisines = $derived(
+    [...new Set(data.restaurants.map(r => r.cuisine_description))].sort()
+  );
+
+let restaurants = $derived(
+  data.restaurants.filter(r => {
+    if (selectedBorough !== '' && r.boro !== selectedBorough) return false;
+    if (selectedCuisine !== '' && r.cuisine_description !== selectedCuisine) return false;
+    if (selectedGrade !== '' && r.grade !== selectedGrade) return false;
+    return true;
+  })
+);
+  let displayed = $derived(restaurants.slice(0, 100));
+
+  let countA = $derived(restaurants.filter(r => r.grade === 'A').length);
+  let countB = $derived(restaurants.filter(r => r.grade === 'B').length);
+  let countC = $derived(restaurants.filter(r => r.grade === 'C').length);
 
   // Article metadata
   let headline = 'Become a force for good. Join our next class.';
@@ -20,6 +46,7 @@ This is your page!
     { headline: 'How to install, configure and use Visual Studio Code, GitHub and Copilot', href: 'https://palewi.re/docs/coding-the-news/scripts/week-1/' },
     { headline: "How to publish a website with Node.JS and GitHub Actions", href:"https://palewi.re/docs/coding-the-news/scripts/week-2/"},
   ];
+
 </script>
 
 <!-- This sets the page title in the browser tab -->
@@ -68,6 +95,40 @@ This is your page!
       Our three media centers provide research, training, thought leadership, industry meet-ups, and financial support for quality journalistic work.
     </p>
 
+<div class="filters">
+  <label for="borough">Borough</label>
+  <select id="borough" bind:value={selectedBorough}>
+    <option value="">All boroughs</option>
+    <option value="Manhattan">Manhattan</option>
+    <option value="Brooklyn">Brooklyn</option>
+    <option value="Queens">Queens</option>
+    <option value="Bronx">Bronx</option>
+    <option value="Staten Island">Staten Island</option>
+  </select>
+
+<label for="grade">Grade</label>
+  <select id="grade" bind:value={selectedGrade}>
+    <option value="">All grades</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+  </select>
+
+  <label for="cuisine">Cuisine</label>
+  <select id="cuisine" bind:value={selectedCuisine}>
+    <option value="">All cuisines</option>
+    {#each cuisines as cuisine}
+      <option value={cuisine}>{cuisine}</option>
+    {/each}
+  </select>
+</div>
+
+<RestaurantTable data={displayed} />
+<Dashboard>
+  <BigNumber value={countA} label="Grade A" />
+  <BigNumber value={countB} label="Grade B" />
+  <BigNumber value={countC} label="Grade C" />
+</Dashboard>
     <p>
       We also offer a robust professional education program through regular evening and weekend workshops. And we support in-depth reporting projects of professional journalists through fellowship grants.
     </p>
