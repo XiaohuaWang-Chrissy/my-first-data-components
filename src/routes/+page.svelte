@@ -27,8 +27,8 @@ let restaurants = $derived(
     if (selectedBorough !== '' && r.boro !== selectedBorough) return false;
     if (selectedCuisine !== '' && r.cuisine_description !== selectedCuisine) return false;
     if (selectedGrade !== '' && r.grade !== selectedGrade) return false;
-    return true;
     if (searchQuery !== '' && !r.dba.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
   })
 );
   let displayed = $derived(restaurants.slice(0, 100));
