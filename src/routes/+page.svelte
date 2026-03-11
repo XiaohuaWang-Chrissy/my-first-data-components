@@ -17,6 +17,7 @@ This is your page!
   let selectedBorough = $state("");
   let selectedCuisine = $state("");
   let selectedGrade = $state("");
+  let searchQuery = $state("");
   let cuisines = $derived(
     [...new Set(data.restaurants.map(r => r.cuisine_description))].sort()
   );
@@ -27,10 +28,10 @@ let restaurants = $derived(
     if (selectedCuisine !== '' && r.cuisine_description !== selectedCuisine) return false;
     if (selectedGrade !== '' && r.grade !== selectedGrade) return false;
     return true;
+    if (searchQuery !== '' && !r.dba.toLowerCase().includes(searchQuery.toLowerCase())) return false;
   })
 );
   let displayed = $derived(restaurants.slice(0, 100));
-
   let countA = $derived(restaurants.filter(r => r.grade === 'A').length);
   let countB = $derived(restaurants.filter(r => r.grade === 'B').length);
   let countC = $derived(restaurants.filter(r => r.grade === 'C').length);
@@ -106,6 +107,9 @@ let restaurants = $derived(
     <option value="Staten Island">Staten Island</option>
   </select>
 
+  <label for="search">Search by name</label>
+  <input id="search" type="text" bind:value={searchQuery} placeholder="e.g. Pizza" />
+
 <label for="grade">Grade</label>
   <select id="grade" bind:value={selectedGrade}>
     <option value="">All grades</option>
@@ -159,4 +163,11 @@ let restaurants = $derived(
   .container {
     padding: var(--spacing-lg) var(--spacing-md);
   }
+  input[type="text"] {
+  display: block;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
 </style>
